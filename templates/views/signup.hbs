@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Node Starter</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src="js/jquery.min.js"></script>
+
+    <link href="css/signup.css" rel="stylesheet">
+
+    <script type="text/javascript">
+        (function ($) {
+            $.fn.serializeFormJSON = function () {
+
+                var o = {};
+                var a = this.serializeArray();
+                $.each(a, function () {
+                    if (o[this.name]) {
+                        if (!o[this.name].push) {
+                            o[this.name] = [o[this.name]];
+                        }
+                        o[this.name].push(this.value || '');
+                    } else {
+                        o[this.name] = this.value || '';
+                    }
+                });
+                return o;
+            };
+        })(jQuery);
+
+        $(document).ready(function () {
+            $("#signup-form").submit(function (e) {
+                e.preventDefault()
+
+                if(!$("#registerSucessAlert").hasClass("d-none")){
+                    $("#registerSucessAlert").addClass("d-none");
+                }
+
+                if(!$("#registerFailureAlert").hasClass("d-none")){
+                    $("#registerFailureAlert").addClass("d-none");
+                }
+
+                var data = $(this).serializeFormJSON()
+                // console.log(data)
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/signupuser',
+                    data: data,
+                    dataType: "json",
+                    success: function (response) {
+                        //alert("a");
+                        if (!response.Success) {
+                            console.log("Sign Up Failed!")
+                            $("#registerFailureAlert").toggleClass("d-none")
+                        } else {
+                            console.log("Sign Up Successful!")
+                            console.log(response.Success);
+                            $('#signup-form')[0].reset();
+                            $("#registerSucessAlert").toggleClass("d-none")
+                        }
+                    },
+                    error: function () {
+                        console.log("Sign Up Failed!")
+                        $("#registerFailureAlert").toggleClass("d-none")
+                    }
+                })
+            })
+        });
+    </script>
+
+</head>
+
+<body class="text-center">
+    <form id="signup-form" class="form-signin">
+        <img class="mb-4" src="assets/npm.png" alt="" width="72" height="72">
+        <h1 class="h3 mb-3 font-weight-normal">Register User</h1>
+        <label for="username" class="sr-only">Username</label>
+        <input name="username" type="text" id="inputUsername" class="form-control" placeholder="Username" required
+            autofocus>
+        <label for="inputEmail" class="sr-only">Email address</label>
+        <input name="email" type="email" id="inputEmail" class="form-control" placeholder="Email address" required
+            autofocus>
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input name="password" type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+        <label for="inputPassword" class="sr-only">Confirm Password</label>
+        <input name="confirmPassword" type="password" id="inputConfirmPassword" class="form-control"
+            placeholder="Confirm Password" required>
+        <input type="submit" value="Sign Up" class="btn btn-lg btn-primary btn-block">
+        <br />
+
+        <div id="registerSucessAlert" class="alert alert-success d-none" role="alert">
+            Successfully registered! <a href="/signin" class="alert-link">Sign In</a>
+        </div>
+        
+        <br />
+
+        <div id="registerFailureAlert" class="alert alert-warning d-none" role="alert">
+            Oops, that didn't go well!
+        </div>
+
+    </form>
+</body>
+
+</html>
